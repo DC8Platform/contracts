@@ -1766,7 +1766,6 @@ contract DC8NFTLaunchpad is
     bytes32 public constant CLAIM_ROLE = keccak256("ADMIN_ACTION_ROLE");
 
     ///////////////// VARIABLES /////////////////
-    address public royaltyAddress;
     address public treasuryAddress;
     INFT public DC8NFT;
     Launchpad[] public launches;
@@ -1864,11 +1863,6 @@ contract DC8NFTLaunchpad is
         uint256 totalValue = launches[_launchIndex].price * _amount;
         require(msg.value == totalValue, "Invalid ETH value");
 
-        (bool sent, ) = royaltyAddress.call{value: (msg.value).mul(5).div(100)}(
-            ""
-        );
-        require(sent, "Failed to send Ether");
-
         for (uint256 i = 0; i < _amount; ) {
             launches[_launchIndex].sold++;
             DC8NFT.safeMint(msg.sender);
@@ -1899,11 +1893,6 @@ contract DC8NFTLaunchpad is
 
         uint256 totalValue = launches[_launchIndex].price * _amount;
         require(msg.value == totalValue, "Invalid ETH value");
-
-        (bool sent, ) = royaltyAddress.call{value: (msg.value).mul(5).div(100)}(
-            ""
-        );
-        require(sent, "Failed to send Ether");
 
         for (uint256 i = 0; i < _amount; ) {
             whiteList[msg.sender][_launchIndex]--;
@@ -1937,7 +1926,7 @@ contract DC8NFTLaunchpad is
 
     function initialize(
         INFT NFT,
-        address _royaltyAddress,
+        // address _royaltyAddress,
         address _treasuryAddress
     ) public initializer {
         __Pausable_init();
@@ -1947,9 +1936,18 @@ contract DC8NFTLaunchpad is
         _setupRole(SETTING_ROLE, msg.sender);
         _setupRole(CLAIM_ROLE, msg.sender);
 
-        royaltyAddress = _royaltyAddress;
         treasuryAddress = _treasuryAddress;
         DC8NFT = NFT;
+
+        launches.push(
+            Launchpad({
+                price: 0 ether,
+                status: false,
+                amount: 0,
+                sold: 0,
+                isPrivate: true
+            })
+        );
 
         launches.push(
             Launchpad({
@@ -1964,7 +1962,7 @@ contract DC8NFTLaunchpad is
         launches.push(
             Launchpad({
                 price: 0.072 ether,
-                status: true,
+                status: false,
                 amount: 0,
                 sold: 0,
                 isPrivate: true
@@ -1975,7 +1973,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.072 ether,
                 status: false,
-                amount: 800,
+                amount: 600,
                 sold: 0,
                 isPrivate: false
             })
@@ -1985,7 +1983,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.074 ether,
                 status: false,
-                amount: 800,
+                amount: 600,
                 sold: 0,
                 isPrivate: false
             })
@@ -1995,7 +1993,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.076 ether,
                 status: false,
-                amount: 800,
+                amount: 600,
                 sold: 0,
                 isPrivate: false
             })
@@ -2005,7 +2003,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.078 ether,
                 status: false,
-                amount: 800,
+                amount: 600,
                 sold: 0,
                 isPrivate: false
             })
@@ -2015,7 +2013,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.08 ether,
                 status: false,
-                amount: 800,
+                amount: 600,
                 sold: 0,
                 isPrivate: false
             })
