@@ -1,3 +1,11 @@
+/**
+ *Submitted for verification at Arbiscan on 2023-05-27
+*/
+
+/**
+ *Submitted for verification at Arbiscan on 2023-05-27
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
@@ -1770,6 +1778,7 @@ contract DC8NFTLaunchpad is
     INFT public DC8NFT;
     Launchpad[] public launches;
     mapping(address walletAddress => mapping(uint256 launchIndex => uint256 maxAmountToBuy)) public whiteList;
+    uint256 public sold = 0;
 
     ///////////////// Events, Structs, Interfaces /////////////////
     event LaunchpadMint(
@@ -1851,6 +1860,7 @@ contract DC8NFTLaunchpad is
         whenNotPaused
     {
         require(_amount > 0, "Invalid amount");
+        require(sold + _amount < 5000, "Launchpad sold out");
         require(_launchIndex < launches.length, "Invalid launchpad");
         require(launches[_launchIndex].status, "Launchpad is disable");
         require(
@@ -1864,6 +1874,7 @@ contract DC8NFTLaunchpad is
         require(msg.value == totalValue, "Invalid ETH value");
 
         for (uint256 i = 0; i < _amount; ) {
+            sold++;
             launches[_launchIndex].sold++;
             DC8NFT.safeMint(msg.sender);
 
@@ -1888,13 +1899,14 @@ contract DC8NFTLaunchpad is
         whenInWhiteList(_launchIndex, _amount)
     {
         require(_amount > 0, "Invalid amount");
+        require(sold + _amount < 5000, "Launchpad sold out");
         require(_launchIndex < launches.length, "Invalid launchpad");
         require(launches[_launchIndex].status, "Launchpad is disable");
-
         uint256 totalValue = launches[_launchIndex].price * _amount;
         require(msg.value == totalValue, "Invalid ETH value");
 
         for (uint256 i = 0; i < _amount; ) {
+            sold++;
             whiteList[msg.sender][_launchIndex]--;
             DC8NFT.safeMint(msg.sender);
 
@@ -1926,15 +1938,15 @@ contract DC8NFTLaunchpad is
 
     function initialize(
         INFT NFT,
-        // address _royaltyAddress,
-        address _treasuryAddress
+        address _treasuryAddress,
+        address _claimAddress
     ) public initializer {
         __Pausable_init();
         __AccessControl_init_unchained();
         __ReentrancyGuard_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(SETTING_ROLE, msg.sender);
-        _setupRole(CLAIM_ROLE, msg.sender);
+        _setupRole(CLAIM_ROLE, _claimAddress);
 
         treasuryAddress = _treasuryAddress;
         DC8NFT = NFT;
@@ -1973,7 +1985,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.072 ether,
                 status: false,
-                amount: 600,
+                amount: 900,
                 sold: 0,
                 isPrivate: false
             })
@@ -1983,7 +1995,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.074 ether,
                 status: false,
-                amount: 600,
+                amount: 900,
                 sold: 0,
                 isPrivate: false
             })
@@ -1993,7 +2005,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.076 ether,
                 status: false,
-                amount: 600,
+                amount: 900,
                 sold: 0,
                 isPrivate: false
             })
@@ -2003,7 +2015,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.078 ether,
                 status: false,
-                amount: 600,
+                amount: 900,
                 sold: 0,
                 isPrivate: false
             })
@@ -2013,7 +2025,7 @@ contract DC8NFTLaunchpad is
             Launchpad({
                 price: 0.08 ether,
                 status: false,
-                amount: 600,
+                amount: 5000,
                 sold: 0,
                 isPrivate: false
             })
