@@ -1,3 +1,11 @@
+/**
+ *Submitted for verification at Arbiscan on 2023-05-27
+*/
+
+/**
+ *Submitted for verification at Arbiscan on 2023-05-27
+*/
+
 // SPDX-License-Identifier: MIT
 // File: @openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol
 
@@ -3176,11 +3184,10 @@ abstract contract ERC721EnumerableUpgradeable is
 
 pragma solidity ^0.8.9;
 
-contract DC8NFT is
+contract ARBDolls is
     Initializable,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable,
-    PausableUpgradeable,
     AccessControlUpgradeable,
     ERC721BurnableUpgradeable,
     UUPSUpgradeable
@@ -3196,14 +3203,14 @@ contract DC8NFT is
     bytes32 public constant SETTING_ROLE = keccak256("SETTING_ROLE");
     string private customBaseURI;
     mapping(uint256 => Nft) public Tokens;
+    bool public paused = false;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {}
 
     function initialize(string calldata initBaseURI) public initializer {
-        __ERC721_init("DC8 NFT", "DC8");
+        __ERC721_init("Hybrid Dolls", "ARBDolls");
         __ERC721Enumerable_init();
-        __Pausable_init();
         __AccessControl_init();
         __ERC721Burnable_init();
         __UUPSUpgradeable_init();
@@ -3227,6 +3234,17 @@ contract DC8NFT is
     modifier whenNotLock(uint256 tokenId) {
         _requireNotLock(tokenId);
         _;
+    }
+
+    modifier whenNotPaused(address from) {
+        _requireNotPaused(from);
+        _;
+    }
+
+    function _requireNotPaused(address from) private view {
+        if (from != address(0)) {
+            require(paused == false, "Pauable: paused");
+        }
     }
 
     function _requireNotLock(uint256 tokenId) private view {
@@ -3272,14 +3290,18 @@ contract DC8NFT is
     //////////////// Standard ERC721 ////////////////
 
     function pause() external onlyRole(PAUSER_ROLE) {
-        _pause();
+        paused = true;
     }
 
     function unpause() external onlyRole(PAUSER_ROLE) {
-        _unpause();
+        paused = false;
     }
 
-    function safeMint(address to) external onlyRole(MINTER_ROLE) returns (uint256) {
+    function safeMint(address to)
+        external
+        onlyRole(MINTER_ROLE)
+        returns (uint256)
+    {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -3295,7 +3317,7 @@ contract DC8NFT is
     )
         internal
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
-        whenNotPaused
+        whenNotPaused(from)
         whenNotLock(tokenId)
     {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
